@@ -7,9 +7,10 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  // TODO: Uncomment the code below to pass the first stage
-  std::cout << "$ ";
-  std::string command;
-  std::getline(std::cin, command);
-  std::cout << std::format("{}: command not found\n", command);
+  while (true) {
+    std::cout << "$ ";
+    std::string command;
+    std::getline(std::cin, command);
+    std::cout << std::format("{}: command not found\n", command);
+  }
 }
