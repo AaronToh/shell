@@ -1,3 +1,4 @@
+#include <format>
 #include <iostream>
 #include <string>
 
@@ -8,4 +9,7 @@ int main() {
 
   // TODO: Uncomment the code below to pass the first stage
   std::cout << "$ ";
+  std::string command;
+  std::getline(std::cin, command);
+  std::cout << std::format("{}: command not found\n", command);
 }
