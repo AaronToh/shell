@@ -60,7 +60,7 @@ int main() {
       } else {
         std::string full = findInPath(arg, paths);
         if (full.empty()) std::cout << std::format("{}: not found\n", arg);
-        else std::cout << std::format("{} is {}", arg, full);
+        else std::cout << std::format("{} is {}\n", arg, full);
       }
     } else {
       std::string full = findInPath(cmd, paths);
