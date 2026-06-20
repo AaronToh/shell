@@ -14,7 +14,7 @@ int main() {
     std::cout << "$ ";
     std::string input;
     std::getline(std::cin, input);
-    size_t space = input.find(' ')
+    size_t space = input.find(' ');
     std::string cmd = input.substr(0, space);
     std::string arg = (space != std::string::npos) ? input.substr(space + 1) : "";
 
