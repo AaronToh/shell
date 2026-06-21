@@ -28,7 +28,7 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  const std::unordered_set<std::string> builtins = {"echo", "exit", "pwd", "type"};
+  const std::unordered_set<std::string> builtins = {"cd", "echo", "exit", "pwd", "type"};
   const std::string PATH = std::getenv("PATH");
   std::vector<std::string> paths;
 
@@ -50,10 +50,17 @@ int main() {
     std::string cmd = input.substr(0, space);
     std::string arg = (space != std::string::npos) ? input.substr(space + 1) : "";
 
-    if (cmd == "exit") {
-      break;
+    if (cmd == "cd") {
+      if (arg.substr(0,1) == "/") {
+        if (fs::exists(arg)) fs::current_path(arg);
+        else std::cout << std::format("cd: {}: No such file or directory\n", arg);
+      }
     } else if (cmd == "echo") {
       std::cout << arg << "\n";
+    } else if (cmd == "exit") {
+      break;
+    } else if (cmd == "pwd") {
+      std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
       if (builtins.contains(arg)) {
         std::cout << std::format("{} is a shell builtin\n", arg);
@@ -62,8 +69,6 @@ int main() {
         if (full.empty()) std::cout << std::format("{}: not found\n", arg);
         else std::cout << std::format("{} is {}\n", arg, full);
       }
-    } else if (cmd == "pwd") {
-      std::cout << std::format("{}\n", fs::current_path().string());
     } else {
       std::string full = findInPath(cmd, paths);
       if (full.empty()) std::cout << std::format("{}: command not found\n", cmd);
