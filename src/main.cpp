@@ -124,6 +124,7 @@ int main() {
         pid_t pid = fork();
         if (pid == 0) {
           execv(full.c_str(), argv.data());
+          _exit(1);
         } else {
           wait(nullptr);
         }
