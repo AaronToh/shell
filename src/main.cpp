@@ -93,7 +93,8 @@ int main() {
       else std::cout << std::format("cd: {}: No such file or directory\n", arg);
     } else if (cmd == "echo") {
       std::string msg = "";
-      for (auto& arg : args) {
+      std::span<std::string> sliced(args.begin() + 1, args.end());
+      for (auto& arg : sliced) {
         msg += (msg.empty() ? "" : " ") + arg;
       }
       std::cout << msg << "\n";
@@ -115,8 +116,7 @@ int main() {
       if (full.empty()) std::cout << std::format("{}: command not found\n", cmd);
       else {
         std::vector<char*> argv;
-        std::span<std::string> sliced(args.begin() + 1, args.end());
-        for (auto& arg : sliced) {
+        for (auto& arg : args) {
           argv.push_back(arg.data());
         }
         argv.push_back(nullptr);
