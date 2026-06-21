@@ -46,9 +46,7 @@ int main() {
     std::cout << "$ ";
     std::string input;
     std::getline(std::cin, input);
-    size_t space = input.find(' ');
-    std::string cmd = input.substr(0, space);
-    size_t i = (space != std::string::npos) ? space + 1 : input.size();
+    size_t i = 0;
     std::vector<std::string> args;
     std::string arg = "";
     while (i < input.size()) {
@@ -82,9 +80,10 @@ int main() {
       }
     }
     if (arg.size() > 0) args.push_back(arg);
+    std::string cmd = args[0];
 
     if (cmd == "cd") {
-      std::string arg = args[0]; // assume that path given
+      std::string arg = args[1]; // assume that path given
       if (arg == "~" || arg.substr(0, 2) == "~/") {
         std::string home = std::getenv("HOME");
         arg = home + arg.substr(1);
@@ -102,7 +101,7 @@ int main() {
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
-      std::string arg = args[0]; // assumes one arg given
+      std::string arg = args[1]; // assumes one arg given
       if (builtins.contains(arg)) {
         std::cout << std::format("{} is a shell builtin\n", arg);
       } else {
