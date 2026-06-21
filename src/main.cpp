@@ -62,6 +62,8 @@ int main() {
         if (full.empty()) std::cout << std::format("{}: not found\n", arg);
         else std::cout << std::format("{} is {}\n", arg, full);
       }
+    } else if (cmd == "pwd") {
+      std::cout << std::format("{}\n", fs::current_path().string());
     } else {
       std::string full = findInPath(cmd, paths);
       if (full.empty()) std::cout << std::format("{}: command not found\n", cmd);
