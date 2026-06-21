@@ -62,19 +62,19 @@ int main() {
         i++; // assume character exists after backslash
         arg += input[i];
         i++;
-      }else if (input[i] == '\'') {
+      } else if (input[i] == '\'') {
         size_t closing = input.find('\'', i + 1); // assume that closing quote exists
         arg += input.substr(i + 1, closing - i - 1);
         i = closing + 1;
       } else if (input[i] == '\"') {
         i++;
-        while (input[i] !=  '\"') { // assume that closing quote exists
+        while (input[i] != '\"') { // assume that closing quote exists
           if (input[i] == '\\') {
             if (input[i+1] == '\"' || input[i+1] == '\\') i++;
           }
           arg += input[i];
+          i++;
         }
-        i++;
       } else {
         arg += input[i];
         i++;
