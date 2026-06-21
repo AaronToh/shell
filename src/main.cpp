@@ -51,10 +51,8 @@ int main() {
     std::string arg = (space != std::string::npos) ? input.substr(space + 1) : "";
 
     if (cmd == "cd") {
-      if (arg.substr(0,1) == "/") {
-        if (fs::exists(arg)) fs::current_path(arg);
-        else std::cout << std::format("cd: {}: No such file or directory\n", arg);
-      }
+      if (fs::exists(arg)) fs::current_path(arg);
+      else std::cout << std::format("cd: {}: No such file or directory\n", arg);
     } else if (cmd == "echo") {
       std::cout << arg << "\n";
     } else if (cmd == "exit") {
