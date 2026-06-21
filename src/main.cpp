@@ -75,6 +75,7 @@ int main() {
           arg += input[i];
           i++;
         }
+        i++;
       } else {
         arg += input[i];
         i++;
