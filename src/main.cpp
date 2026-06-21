@@ -114,7 +114,6 @@ int main() {
       if (full.empty()) std::cout << std::format("{}: command not found\n", cmd);
       else {
         std::vector<char*> argv;
-        argv.push_back(cmd.data());
         for (auto& arg : args) {
           argv.push_back(arg.data());
         }
