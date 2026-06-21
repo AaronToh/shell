@@ -48,9 +48,29 @@ int main() {
     std::getline(std::cin, input);
     size_t space = input.find(' ');
     std::string cmd = input.substr(0, space);
-    std::string arg = (space != std::string::npos) ? input.substr(space + 1) : "";
+    size_t i = (space != std::string::npos) ? space + 1 : input.size();
+    std::vector<std::string> args;
+    std::string arg = "";
+    while (i < input.size()) {
+      if (input[i] == ' ') {
+        if (arg.size() > 0) {
+          args.push_back(arg);
+          arg = "";
+        }
+        i++;
+      } else if (input[i] == '\'') {
+        size_t closing = input.find('\'', i + 1); // assume that closing quote exists
+        arg += input.substr(i + 1, closing - i - 1);
+        i = closing + 1;
+      } else {
+        arg += input[i];
+        i++;
+      }
+    }
+    if (arg.size() > 0) args.push_back(arg);
 
     if (cmd == "cd") {
+      std::string arg = args[0]; // assume that path given
       if (arg == "~" || arg.substr(0, 2) == "~/") {
         std::string home = std::getenv("HOME");
         arg = home + arg.substr(1);
@@ -58,12 +78,17 @@ int main() {
       if (fs::exists(arg)) fs::current_path(arg);
       else std::cout << std::format("cd: {}: No such file or directory\n", arg);
     } else if (cmd == "echo") {
-      std::cout << arg << "\n";
+      std::string msg = "";
+      for (auto& arg : args) {
+        msg += (msg.empty() ? "" : " ") + arg;
+      }
+      std::cout << msg << "\n";
     } else if (cmd == "exit") {
       break;
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
+      std::string arg = args[0]; // assumes one arg given
       if (builtins.contains(arg)) {
         std::cout << std::format("{} is a shell builtin\n", arg);
       } else {
@@ -75,22 +100,10 @@ int main() {
       std::string full = findInPath(cmd, paths);
       if (full.empty()) std::cout << std::format("{}: command not found\n", cmd);
       else {
-        std::vector<std::string> argt;
-        argt.push_back(cmd);
-        size_t start = 0;
-        size_t end = arg.find(' ');
-        if (!arg.empty()) {
-          while (end != std::string::npos) {
-            argt.push_back(arg.substr(start, end - start));
-            start = end + 1;
-            end = arg.find(' ', start);
-          }
-          argt.push_back(arg.substr(start));
-        }
-
         std::vector<char*> argv;
-        for (auto& p : argt) {
-          argv.push_back(const_cast<char*>(p.c_str()));
+        argv.push_back(cmd.data());
+        for (auto& arg : args) {
+          argv.push_back(arg.data());
         }
         argv.push_back(nullptr);
 
