@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
+#include <span>
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -114,7 +115,8 @@ int main() {
       if (full.empty()) std::cout << std::format("{}: command not found\n", cmd);
       else {
         std::vector<char*> argv;
-        for (auto& arg : args) {
+        std::span<std::string> sliced(args.begin() + 1, args.end());
+        for (auto& arg : sliced) {
           argv.push_back(arg.data());
         }
         argv.push_back(nullptr);
