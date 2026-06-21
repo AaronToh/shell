@@ -51,6 +51,10 @@ int main() {
     std::string arg = (space != std::string::npos) ? input.substr(space + 1) : "";
 
     if (cmd == "cd") {
+      if (arg == "~" || arg.substr(0, 2) == "~/") {
+        std::string home = std::getenv("HOME");
+        arg = home + arg.substr(1);
+      }
       if (fs::exists(arg)) fs::current_path(arg);
       else std::cout << std::format("cd: {}: No such file or directory\n", arg);
     } else if (cmd == "echo") {
