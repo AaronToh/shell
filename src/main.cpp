@@ -58,7 +58,11 @@ int main() {
           arg = "";
         }
         i++;
-      } else if (input[i] == '\'') {
+      } else if (input[i] == '\\') {
+        i++; // assume character exists after backslash
+        arg += input[i];
+        i++;
+      }else if (input[i] == '\'') {
         size_t closing = input.find('\'', i + 1); // assume that closing quote exists
         arg += input.substr(i + 1, closing - i - 1);
         i = closing + 1;
