@@ -62,6 +62,10 @@ int main() {
         size_t closing = input.find('\'', i + 1); // assume that closing quote exists
         arg += input.substr(i + 1, closing - i - 1);
         i = closing + 1;
+      } else if (input[i] == '\"') {
+        size_t closing = input.find('\"', i + 1);
+        arg += input.substr(i + 1, closing - i - 1);
+        i = closing + 1;
       } else {
         arg += input[i];
         i++;
