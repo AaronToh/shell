@@ -29,7 +29,7 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  const std::unordered_set<std::string> builtins = {"cd", "echo", "exit", "pwd", "type"};
+  const std::unordered_set<std::string> builtins = {"cd", "echo", "exit", "job", "pwd", "type"};
   const std::string PATH = std::getenv("PATH");
   std::vector<std::string> paths;
 
