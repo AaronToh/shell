@@ -123,7 +123,7 @@ int main() {
         } else {
           status = "";
         }
-        std::cout << std::format("[{}]+  {:<24}{} &\n", id, status, input);
+        std::cout << std::format("[{}]+  {:<24}{}\n", id, status, input);
       }
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
