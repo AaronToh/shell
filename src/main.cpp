@@ -34,9 +34,6 @@ int main() {
   const std::string PATH = std::getenv("PATH");
   std::vector<std::string> paths;
   std::vector<std::pair<pid_t, std::string>> backgroundJobs = {{}};
-  size_t backgroundId = 1;
-  size_t recentId = 0;
-  size_t secondRecentId = 0;
 
   size_t start = 0;
   size_t end = PATH.find(':');
@@ -115,15 +112,19 @@ int main() {
       for (size_t id = 1; id < backgroundJobs.size(); id++) {
         auto& [pid, input] = backgroundJobs[id];
         std::string status;
-        char marker = id == recentId ? '+' : (id == secondRecentId ? '-' : ' ');
-        pid_t result = waitpid(pid, nullptr, WNOHANG);
+        size_t last = backgroundJobs.size() - 1;
+        char marker = id == last ? '+' : (id == last - 1 ? '-' : ' ');
+        int s;
+        pid_t result = waitpid(pid, &s, WNOHANG);
         
         if (result == 0) {
           status = "Running";
         } else {
-          status = "";
+          if (WIFEXITED(status)) status = "Done";
         }
+
         std::cout << std::format("[{}]{}  {:<24}{}\n", id, marker, status, input);
+        if (status == "Done") backgroundJobs.pop_back();
       }
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
@@ -153,9 +154,7 @@ int main() {
         } else {
           if (isBackground) {
             backgroundJobs.push_back({pid, input});
-            if (recentId != 0) secondRecentId = recentId;
-            recentId = backgroundId;
-            std::cout << std::format("[{}] {}\n", backgroundId++, pid);
+            std::cout << std::format("[{}] {}\n", backgroundJobs.size() - 1, pid);
           }
           else waitpid(pid, nullptr, 0);
         }
