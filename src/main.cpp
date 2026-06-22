@@ -135,7 +135,7 @@ int main() {
           _exit(1);
         } else {
           if (isBackground) std::cout << std::format("[{}] {}\n", backgroundId++, pid);
-          else wait(nullptr);
+          else waitpid(pid, nullptr, 0);
         }
       }
     }
