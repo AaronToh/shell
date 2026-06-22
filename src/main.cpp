@@ -45,7 +45,7 @@ int main() {
   paths.push_back(PATH.substr(start));
 
   while (true) {
-    std::cout << "\n$ ";
+    std::cout << "$ ";
     std::string input;
     std::getline(std::cin, input);
     size_t i = 0;
