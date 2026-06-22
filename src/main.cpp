@@ -120,7 +120,7 @@ int main() {
         if (result == 0) {
           status = "Running";
         } else {
-          if (WIFEXITED(status)) status = "Done";
+          if (WIFEXITED(s)) status = "Done";
         }
 
         std::cout << std::format("[{}]{}  {:<24}{}\n", id, marker, status, input);
