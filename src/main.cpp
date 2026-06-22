@@ -134,7 +134,7 @@ int main() {
           execv(full.c_str(), argv.data());
           _exit(1);
         } else {
-          if (isBackground) std::cout << std::format("[{}] {}", backgroundId++, pid);
+          if (isBackground) std::cout << std::format("[{}] {}\n", backgroundId++, pid);
           else wait(nullptr);
         }
       }
