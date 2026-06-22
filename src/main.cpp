@@ -6,7 +6,9 @@
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <unordered_map>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 
 namespace fs = std::filesystem;
@@ -32,7 +34,9 @@ int main() {
   const std::unordered_set<std::string> builtins = {"cd", "echo", "exit", "jobs", "pwd", "type"};
   const std::string PATH = std::getenv("PATH");
   std::vector<std::string> paths;
+  std::unordered_map<pid_t, std::pair<size_t, std::string>> backgroundJobs;
   size_t backgroundId = 1;
+  size_t recentId;
 
   size_t start = 0;
   size_t end = PATH.find(':');
@@ -82,6 +86,7 @@ int main() {
       }
     }
     if (arg.size() > 0) args.push_back(arg);
+    if (args.size() == 0) continue;
     std::string cmd = args[0];
     bool isBackground = false;
     if (args.back() == "&") {
@@ -107,7 +112,19 @@ int main() {
     } else if (cmd == "exit") {
       break;
     } else if (cmd == "jobs") {
-      
+      for (const auto& [pid, val] : backgroundJobs) {
+        size_t id = val.first;
+        std::string input = val.second;
+        std::string status;
+        pid_t result = waitpid(pid, nullptr, WNOHANG);
+        
+        if (result == 0) {
+          status = "Running";
+        } else {
+          status = "";
+        }
+        std::cout << std::format("[{}]+  {:<24}{} &\n", id, status, input);
+      }
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
@@ -134,7 +151,11 @@ int main() {
           execv(full.c_str(), argv.data());
           _exit(1);
         } else {
-          if (isBackground) std::cout << std::format("[{}] {}\n", backgroundId++, pid);
+          if (isBackground) {
+            backgroundJobs[pid] = {backgroundId, input};
+            recentId = backgroundId;
+            std::cout << std::format("[{}] {}\n", backgroundId++, pid);
+          }
           else waitpid(pid, nullptr, 0);
         }
       }
