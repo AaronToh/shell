@@ -100,6 +100,8 @@ int main() {
       std::cout << msg << "\n";
     } else if (cmd == "exit") {
       break;
+    } else if (cmd == "job") {
+      
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
