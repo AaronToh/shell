@@ -124,7 +124,7 @@ int main() {
         }
         std::string amp = status == "Running" ? " &" : "";
 
-        std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input);
+        std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
         if (status == "Done") backgroundJobs.pop_back(); // assume if done it is the last one
       }
     } else if (cmd == "pwd") {
