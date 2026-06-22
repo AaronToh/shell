@@ -123,8 +123,8 @@ int main() {
           if (WIFEXITED(s)) status = "Done";
         }
 
-        std::cout << std::format("[{}]{}  {:<24}{}\n", id, marker, status, input);
-        if (status == "Done") backgroundJobs.pop_back();
+        std::cout << std::format("[{}]{}  {:<24}{} &\n", id, marker, status, input);
+        if (status == "Done") backgroundJobs.pop_back(); // assume if done it is the last one
       }
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
@@ -153,7 +153,7 @@ int main() {
           _exit(1);
         } else {
           if (isBackground) {
-            backgroundJobs.push_back({pid, input});
+            backgroundJobs.push_back({pid, input.substr(0, input.rfind(" &"))});
             std::cout << std::format("[{}] {}\n", backgroundJobs.size() - 1, pid);
           }
           else waitpid(pid, nullptr, 0);
