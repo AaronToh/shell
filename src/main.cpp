@@ -32,6 +32,7 @@ int main() {
   const std::unordered_set<std::string> builtins = {"cd", "echo", "exit", "jobs", "pwd", "type"};
   const std::string PATH = std::getenv("PATH");
   std::vector<std::string> paths;
+  size_t backgroundId = 1;
 
   size_t start = 0;
   size_t end = PATH.find(':');
@@ -82,6 +83,11 @@ int main() {
     }
     if (arg.size() > 0) args.push_back(arg);
     std::string cmd = args[0];
+    bool isBackground = false;
+    if (args.back() == "&") {
+      isBackground = true;
+      args.pop_back();
+    }
 
     if (cmd == "cd") {
       std::string arg = args[1]; // assume that path given
@@ -128,7 +134,8 @@ int main() {
           execv(full.c_str(), argv.data());
           _exit(1);
         } else {
-          wait(nullptr);
+          if (isBackground) std::cout << std::format("[{}] {}", backgroundId++, pid);
+          else wait(nullptr);
         }
       }
     }
