@@ -6,7 +6,6 @@
 #include <string>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <unordered_map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -34,9 +33,10 @@ int main() {
   const std::unordered_set<std::string> builtins = {"cd", "echo", "exit", "jobs", "pwd", "type"};
   const std::string PATH = std::getenv("PATH");
   std::vector<std::string> paths;
-  std::unordered_map<pid_t, std::pair<size_t, std::string>> backgroundJobs;
+  std::vector<std::pair<pid_t, std::string>> backgroundJobs = {{}};
   size_t backgroundId = 1;
-  size_t recentId;
+  size_t recentId = 0;
+  size_t secondRecentId = 0;
 
   size_t start = 0;
   size_t end = PATH.find(':');
@@ -112,10 +112,10 @@ int main() {
     } else if (cmd == "exit") {
       break;
     } else if (cmd == "jobs") {
-      for (const auto& [pid, val] : backgroundJobs) {
-        size_t id = val.first;
-        std::string input = val.second;
+      for (size_t id = 1; id < backgroundJobs.size(); id++) {
+        auto& [pid, input] = backgroundJobs[id];
         std::string status;
+        char marker = id == recentId ? '+' : (id == secondRecentId ? '-' : ' ');
         pid_t result = waitpid(pid, nullptr, WNOHANG);
         
         if (result == 0) {
@@ -123,7 +123,7 @@ int main() {
         } else {
           status = "";
         }
-        std::cout << std::format("[{}]+  {:<24}{}\n", id, status, input);
+        std::cout << std::format("[{}]{}  {:<24}{}\n", id, marker, status, input);
       }
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
@@ -152,7 +152,8 @@ int main() {
           _exit(1);
         } else {
           if (isBackground) {
-            backgroundJobs[pid] = {backgroundId, input};
+            backgroundJobs.push_back({pid, input});
+            if (recentId != 0) secondRecentId = recentId;
             recentId = backgroundId;
             std::cout << std::format("[{}] {}\n", backgroundId++, pid);
           }
