@@ -159,7 +159,7 @@ int main() {
           _exit(1);
         } else {
           if (isBackground) {
-            backgroundJobs.push_back({pid, input.substr(0, input.rfind(" &"))});
+            backgroundJobs.push_back(std::optional<std::pair<pid_t, std::string>>({pid, input.substr(0, input.rfind(" &"))}));
             std::cout << std::format("[{}] {}\n", backgroundJobs.size() - 1, pid);
           }
           else waitpid(pid, nullptr, 0);
