@@ -111,7 +111,7 @@ int main() {
       break;
     } else if (cmd == "jobs") {
       size_t secondLast = backgroundJobs.size() - 2;
-      while (!backgroundJobs[secondLast].has_value()) secondLast--;
+      while (secondLast > 0 && !backgroundJobs[secondLast].has_value()) secondLast--;
       for (size_t id = 1; id < backgroundJobs.size(); id++) {
         if (!backgroundJobs[id].has_value()) continue;
         auto& [pid, input] = backgroundJobs[id].value();
@@ -127,13 +127,13 @@ int main() {
           if (WIFEXITED(s)) status = "Done";
         }
         std::string amp = status == "Running" ? " &" : "";
-
+        
         std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
         if (status == "Done") {
           backgroundJobs[id] = std::nullopt;
         }
       }
-      while (!backgroundJobs.back().has_value()) backgroundJobs.pop_back();
+      while (backgroundJobs.size() > 1 && !backgroundJobs.back().has_value()) backgroundJobs.pop_back();
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
