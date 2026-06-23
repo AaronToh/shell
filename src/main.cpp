@@ -76,7 +76,6 @@ int main() {
   paths.push_back(PATH.substr(start));
 
   while (true) {
-    printJobs(backgroundJobs, true);
     std::cout << "$ ";
     std::string input;
     std::getline(std::cin, input);
@@ -175,5 +174,6 @@ int main() {
         }
       }
     }
+    printJobs(backgroundJobs, true);
   }
 }
