@@ -110,7 +110,7 @@ int main() {
     } else if (cmd == "exit") {
       break;
     } else if (cmd == "jobs") {
-      size_t secondLast = backgroundJobs.size() - 2;
+      size_t secondLast = backgroundJobs.size() >= 2 ? backgroundJobs.size() - 2 : 0;
       while (secondLast > 0 && !backgroundJobs[secondLast].has_value()) secondLast--;
       for (size_t id = 1; id < backgroundJobs.size(); id++) {
         if (!backgroundJobs[id].has_value()) continue;
