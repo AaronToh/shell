@@ -26,6 +26,35 @@ std::string findInPath(const std::string& arg, const std::vector<std::string>& p
   return "";
 }
 
+void printJobs(std::vector<std::optional<std::pair<pid_t, std::string>>>& backgroundJobs,  bool doneOnly) {
+  size_t secondLast = backgroundJobs.size() >= 2 ? backgroundJobs.size() - 2 : 0;
+  while (secondLast > 0 && !backgroundJobs[secondLast].has_value()) secondLast--;
+  for (size_t id = 1; id < backgroundJobs.size(); id++) {
+    if (!backgroundJobs[id].has_value()) continue;
+    auto& [pid, input] = backgroundJobs[id].value();
+    std::string status;
+    size_t last = backgroundJobs.size() - 1;
+    char marker = id == last ? '+' : (id == secondLast ? '-' : ' ');
+    int s;
+    pid_t result = waitpid(pid, &s, WNOHANG);
+    
+    if (result == 0) {
+      status = "Running";
+    } else {
+      if (WIFEXITED(s)) status = "Done";
+    }
+    std::string amp = status == "Running" ? " &" : "";
+    
+    if (doneOnly && status == "Done") std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
+    else std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
+
+    if (status == "Done") {
+      backgroundJobs[id] = std::nullopt;
+    }
+  }
+  while (backgroundJobs.size() > 1 && !backgroundJobs.back().has_value()) backgroundJobs.pop_back();
+}
+
 int main() {
   // Flush after every std::cout / std:cerr
   std::cout << std::unitbuf;
@@ -47,6 +76,7 @@ int main() {
   paths.push_back(PATH.substr(start));
 
   while (true) {
+    printJobs(backgroundJobs, true);
     std::cout << "$ ";
     std::string input;
     std::getline(std::cin, input);
@@ -110,30 +140,7 @@ int main() {
     } else if (cmd == "exit") {
       break;
     } else if (cmd == "jobs") {
-      size_t secondLast = backgroundJobs.size() >= 2 ? backgroundJobs.size() - 2 : 0;
-      while (secondLast > 0 && !backgroundJobs[secondLast].has_value()) secondLast--;
-      for (size_t id = 1; id < backgroundJobs.size(); id++) {
-        if (!backgroundJobs[id].has_value()) continue;
-        auto& [pid, input] = backgroundJobs[id].value();
-        std::string status;
-        size_t last = backgroundJobs.size() - 1;
-        char marker = id == last ? '+' : (id == secondLast ? '-' : ' ');
-        int s;
-        pid_t result = waitpid(pid, &s, WNOHANG);
-        
-        if (result == 0) {
-          status = "Running";
-        } else {
-          if (WIFEXITED(s)) status = "Done";
-        }
-        std::string amp = status == "Running" ? " &" : "";
-        
-        std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
-        if (status == "Done") {
-          backgroundJobs[id] = std::nullopt;
-        }
-      }
-      while (backgroundJobs.size() > 1 && !backgroundJobs.back().has_value()) backgroundJobs.pop_back();
+      printJobs(backgroundJobs, false);
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
