@@ -45,7 +45,9 @@ void printJobs(std::vector<std::optional<std::pair<pid_t, std::string>>>& backgr
     }
     std::string amp = status == "Running" ? " &" : "";
     
-    if (doneOnly && status == "Done") std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
+    if (doneOnly) {
+      if (status == "Done") std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
+    }
     else std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
 
     if (status == "Done") {
