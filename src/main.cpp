@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <format>
 #include <iostream>
+#include <optional>
 #include <span>
 #include <string>
 #include <sys/wait.h>
@@ -33,7 +34,7 @@ int main() {
   const std::unordered_set<std::string> builtins = {"cd", "echo", "exit", "jobs", "pwd", "type"};
   const std::string PATH = std::getenv("PATH");
   std::vector<std::string> paths;
-  std::vector<std::pair<pid_t, std::string>> backgroundJobs = {{}};
+  std::vector<std::optional<std::pair<pid_t, std::string>>> backgroundJobs = {std::nullopt};
 
   size_t start = 0;
   size_t end = PATH.find(':');
@@ -110,7 +111,8 @@ int main() {
       break;
     } else if (cmd == "jobs") {
       for (size_t id = 1; id < backgroundJobs.size(); id++) {
-        auto& [pid, input] = backgroundJobs[id];
+        if (!backgroundJobs[id].has_value()) continue;
+        auto& [pid, input] = backgroundJobs[id].value();
         std::string status;
         size_t last = backgroundJobs.size() - 1;
         char marker = id == last ? '+' : (id == last - 1 ? '-' : ' ');
@@ -125,8 +127,11 @@ int main() {
         std::string amp = status == "Running" ? " &" : "";
 
         std::cout << std::format("[{}]{}  {:<24}{}{}\n", id, marker, status, input, amp);
-        if (status == "Done") backgroundJobs.pop_back(); // assume if done it is the last one
+        if (status == "Done") {
+          backgroundJobs[id] = std::nullopt;
+        }
       }
+      while (!backgroundJobs.back().has_value()) backgroundJobs.pop_back();
     } else if (cmd == "pwd") {
       std::cout << std::format("{}\n", fs::current_path().string());
     } else if (cmd == "type") {
