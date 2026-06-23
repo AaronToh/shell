@@ -110,12 +110,14 @@ int main() {
     } else if (cmd == "exit") {
       break;
     } else if (cmd == "jobs") {
+      size_t secondLast = backgroundJobs.size() - 2;
+      while (!backgroundJobs[secondLast].has_value()) secondLast--;
       for (size_t id = 1; id < backgroundJobs.size(); id++) {
         if (!backgroundJobs[id].has_value()) continue;
         auto& [pid, input] = backgroundJobs[id].value();
         std::string status;
         size_t last = backgroundJobs.size() - 1;
-        char marker = id == last ? '+' : (id == last - 1 ? '-' : ' ');
+        char marker = id == last ? '+' : (id == secondLast ? '-' : ' ');
         int s;
         pid_t result = waitpid(pid, &s, WNOHANG);
         
